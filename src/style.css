@@ -1,0 +1,81 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f3f3f3;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.left-section {
+  flex: 2;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.video-player video {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.video-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.video-controls span {
+  font-weight: bold;
+}
+
+.video-sequences {
+  margin-bottom: 20px;
+}
+
+.right-section {
+  flex: 1;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.video-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.video-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.video-title {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.control-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+fluent-button {
+  --background-color: #0078d4;
+  --background-color-hover: #005a9e;
+  --background-color-active: #004578;
+  --color: white;
+}

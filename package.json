@@ -1,0 +1,20 @@
+{
+  "name": "video-editor-electron",
+  "version": "1.0.0",
+  "description": "A simple video editor using Electron with Chromecast support",
+  "main": "main.js",
+  "scripts": {
+    "start": "NODE_ENV=development electron .",
+    "dev": "NODE_ENV=development electron . --watch"
+  },
+  "devDependencies": {
+    "electron": "^25.3.1",
+    "electron-packager": "^17.1.2",
+    "electron-reload": "^2.0.0-alpha.1"
+  },
+  "dependencies": {
+    "@electron/remote": "^2.1.2",
+    "@fluentui/react": "^8.120.9",
+    "@fluentui/style-utilities": "^8.10.21"
+  }
+}

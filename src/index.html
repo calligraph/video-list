@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy"
+  content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline'; media-src 'self' https://www.learningcontainer.com;">
+  <title>Éditeur Vidéo</title>
+  <!-- Fluent UI Web Components -->
+  <script type="module" src="https://unpkg.com/@fluentui/web-components@2.0.0/dist/web-components.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <!-- Section gauche : Lecteur vidéo et séquences -->
+    <div class="left-section">
+      <div class="video-player">
+        <video 
+          id="videoPlayer" width="640" height="360" controls 
+          src="https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4">
+          Votre navigateur ne supporte pas la balise vidéo.
+        </video>
+      </div>
+      <div id="video-controls">
+        <fluent-button appearance="stealth">⏮️</fluent-button>
+        <fluent-button appearance="stealth">⏭️</fluent-button>
+        <span id="video-timer">01:50 / 2:06:21</span>
+        <fluent-button id="castButton" appearance="stealth">🎥</fluent-button>
+        <fluent-button id="fullscreenButton" appearance="stealth">🖥️</fluent-button>
+      </div>
+      <div id="scenesContainer">
+        <label>Scènes conservées</label>
+        <canvas id="sequenceCanvas" width="640" height="50"></canvas>
+        <fluent-button appearance="stealth">➕ Add a cut</fluent-button>
+      </div>
+    </div>
+
+    <!-- Section droite : Liste des vidéos et boutons de contrôle -->
+    <div class="right-section">
+      <fluent-button appearance="primary">Ajouter des vidéos</fluent-button>
+      <ul class="video-list" id="videoList">
+        <li class="video-item">
+          <fluent-avatar name="A"></fluent-avatar>
+          <span class="video-title">Video1</span>
+          <fluent-checkbox checked></fluent-checkbox>
+        </li>
+        <li class="video-item">
+          <fluent-avatar name="A"></fluent-avatar>
+          <span class="video-title">List item</span>
+          <fluent-checkbox checked></fluent-checkbox>
+        </li>
+        <!-- Ajoutez plus d'éléments ici -->
+      </ul>
+      <div class="control-buttons">
+        <fluent-button appearance="primary" id="loadButton">Charger</fluent-button>
+        <fluent-button appearance="primary" id="saveButton">Sauvegarder</fluent-button>
+      </div>
+    </div>
+  </div>
+
+  <script src="init.js" defer></script>
+</body>
+
+</html>
