@@ -18,7 +18,8 @@ const elements = {
   addVideosButton: document.getElementById('addVideosButton'),
   sequenceBar: document.getElementById('sequenceBar'),
   addCutButton: document.querySelector('fluent-button'),
-  dropZone: document.getElementById('dropZone')
+  dropZone: document.getElementById('dropZone'),
+  playlistTitle: document.getElementById('playlistTitle'),
 };
 
 // Initialize application
@@ -38,6 +39,7 @@ function loadSavedVideos() {
     videoManager.load(savedData);
     elements.playAllCheckbox.checked = videoManager.playAll;
     elements.onlySequencesCheckbox.checked = videoManager.onlySequences;
+    elements.playlistTitle.innerText = videoManager.title;
     console.log('Vidéos chargées automatiquement depuis localStorage.');
   } else {
     console.log('Aucune vidéo dans localStorage, démarrage avec un modèle vide.');
@@ -85,6 +87,9 @@ function setupEventListeners() {
   elements.addCutButton.addEventListener('click', handleAddCut);
   elements.playAllCheckbox.addEventListener('change', (e) =>  {videoManager.playAll = e.currentTarget.checked})
   elements.onlySequencesCheckbox.addEventListener('change', (e) => {videoManager.onlySequences = e.currentTarget.checked})
+  // Titre de la playlist
+  elements.playlistTitle.addEventListener('input', (e) => videoManager.setTitle(e.target.innerText).save())
+  elements.playlistTitle.addEventListener('blur', (e) => e.target.scrollLeft = 0)
 }
 
 // Get current time of the video

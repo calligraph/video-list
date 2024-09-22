@@ -5,6 +5,12 @@ body {
   background-color: #f3f3f3;
 }
 
+[contenteditable="true"]:focus {
+  outline: 0.1px dashed #0078d475;
+  cursor: text;
+  text-overflow: unset;
+}
+
 .container {
   display: flex;
   justify-content: space-between;
@@ -48,6 +54,16 @@ body {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   max-width: 50%;
+}
+
+.playlist-title {
+  font-size: 1.5em;
+  text-align: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .video-list {
@@ -100,9 +116,7 @@ body {
 }
 
 .video-item span.title[contenteditable="true"]:focus {
-  outline: 0.1px dashed #0078d475;
   cursor: text;
-  text-overflow: unset;
 }
 
 .video-item input[type="checkbox"] {

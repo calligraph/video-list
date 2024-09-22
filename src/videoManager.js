@@ -107,10 +107,16 @@ class VideoManager {
     this.sequencesBar = null
     this.onlySequences = true
     this.playAll = true
+    this.title = "Titre de la playlist";
   }
 
   setSequencesBar(sequencesBar) {
     this.sequencesBar = sequencesBar;
+  }
+
+  setTitle(title) {
+    this.title = title;
+    return this;
   }
 
   addVideo(title, path, enabled = true) {
@@ -252,16 +258,18 @@ class VideoManager {
       isPlaying: this.isPlaying,
       playAll: this.playAll,
       videos: this.videos,
+      title: this.title, // Ajout du titre de la playlist
     };
   }
 
   loadFromExternal(data) {
-    try {
+    try {    
+      this.title = data.title || "Titre de la playlist";
       this.videos = data.videos.map(video => new Video(video.title, video.path, video.enabled, video.timeCode, video.duration, video.cutscenes));
-      this.currentVideoIndex = data.currentVideoIndex;
-      this.isPlaying = data.isPlaying;
-      this.playAll = data.playAll;
-      this.onlySequences = data.onlySequences;
+      this.currentVideoIndex = data.currentVideoIndex || 0;
+      this.isPlaying = data.isPlaying || false;
+      this.playAll = data.playAll || false;
+      this.onlySequences = data.onlySequences || false;
     } catch (error) {
       console.error('Erreur de chargement depuis JSON:', error);
     }
@@ -282,7 +290,6 @@ class VideoManager {
   }
 
   renderVideo() {
-    console.log(this.getCurrentVideo())
     renderCurrentVideo(this.getCurrentVideo(), this.isPlaying);
     this.sequencesBar.setVideo(this.getCurrentVideo()).render()
   }
