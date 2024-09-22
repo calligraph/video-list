@@ -79,17 +79,25 @@ function renderVideoItem(videoManager, video, index, isCurrent) {
   });
   videoItem.appendChild(playButton);
 
-
   // Ajouter le titre de la vidéo et la rendre cliquable
   const title = document.createElement('span');
   title.classList.add('title');
   title.innerText = video.title;
-  videoItem.appendChild(title);
+  title.title = video.title; // Tooltip pour afficher le titre complet
+  title.setAttribute('contenteditable', 'true')
 
-  // Rendre la vidéo cliquable pour la rendre courante
-  title.addEventListener('click', () => {
-    videoManager.togglePlayPause(index); // Met à jour l'affichage de la vidéo courante
+  //-- À chaque modification du texte, on met à jour le titre dans l'objet vidéo
+  title.addEventListener('input', (e) => {
+    video.title = e.target.innerText; // Met à jour le titre dans l'objet video
+    videoManager.save(); // Sauvegarde de la liste des vidéos
   });
+
+  //-- Lorsque l'édition est terminée (on sort du champ), on remet le style d'ellipsis
+  title.addEventListener('blur', () => {
+    title.scrollLeft = 0; // Remet le texte à zéro après l'édition
+  });
+
+  videoItem.appendChild(title);
 
   // Ajouter la case à cocher et le bouton de suppression (comme avant)
   const checkbox = document.createElement('input');
