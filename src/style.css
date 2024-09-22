@@ -17,6 +17,7 @@ body {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 50%;
 }
 
 .video-player video {
@@ -25,19 +26,19 @@ body {
   margin-bottom: 10px;
 }
 
-.video-controls {
+.video-player video:focus {
+  outline: none;
+}
+
+#video-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.video-controls span {
+#video-controls span {
   font-weight: bold;
-}
-
-.video-sequences {
-  margin-bottom: 20px;
 }
 
 .right-section {
@@ -46,6 +47,7 @@ body {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 50%;
 }
 
 .video-list {
@@ -58,8 +60,58 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0;
+  padding: 5px;
   border-bottom: 1px solid #ddd;
+}
+
+.video-item.current {
+  background-color: beige;
+}
+
+.video-item .play-button {
+  color: gray;
+  opacity: 0.1;
+  font-size: 16px;
+  cursor: pointer;
+  margin-right: 10px;
+  width: 10px;
+}
+
+.video-item .play-button:before {
+  content: "►";
+}
+
+.video-item.playing.current .play-button:before {
+  content: "◼";
+}
+
+.video-item.current .play-button {
+  opacity: 1;
+  color: #0076FA;
+}
+
+.video-item span.title {
+  cursor: pointer;
+  flex-shrink: 1;
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.video-item input[type="checkbox"] {
+  margin-right: 10px;
+  max-width: 20px;
+  cursor: pointer;
+}
+
+.video-item fluent-button {
+  margin-left: 10px;
+  margin-right: 0;
+}
+
+.neutral {
+  margin-left: auto;
 }
 
 .video-title {
@@ -78,4 +130,123 @@ fluent-button {
   --background-color-hover: #005a9e;
   --background-color-active: #004578;
   --color: white;
+}
+
+.drop-zone {
+  border: 2px dashed #ccc;
+  padding: 20px;
+  text-align: center;
+  color: #aaa;
+}
+
+.drop-zone.dragging {
+  border-color: #666;
+  color: #000;
+}
+
+
+
+/*//////////////////////////////////////////////
+/ SequenceBar
+*/
+.scenes-container .informations {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.9em
+}
+
+.scenes-container-bar {
+  position: relative;
+  width: 100%;
+  height: 30px;
+  margin-top: 20px;
+}
+
+.sequence-bar {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.sequence {
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.sequence .resize-handle {
+  position: absolute;
+  z-index: 3;
+  width: 10px;
+  height: 100%;
+  top: 0;
+}
+
+.sequence .resize-handle.left {
+  left: 0;
+  cursor: nw-resize;
+}
+
+.sequence .resize-handle.right {
+  right: 0;
+  cursor: ne-resize;
+}
+
+.sequence:hover {
+  cursor: "🗑", auto;
+}
+
+.sequence:hover .resize-handle {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.cut-icon {
+  cursor: crosshair;
+}
+
+.trash-icon {
+  cursor: url('trash-icon.png'), auto;
+}
+
+.merge-icon {
+  cursor: url('merge-icon.png'), auto;
+}
+
+.current-time-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background-color: red;
+  z-index: 100;
+
+}
+
+.sequence::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .8;
+  z-index: 1;
+}
+
+.sequence.even::before {
+  background-color: greenyellow;
+}
+
+.sequence.odd::before {
+  background-color: green;
+}
+
+.sequence:hover::before {
+  opacity: 1;
+}
+
+.sequence.current::before {
+  opacity: 1;
 }

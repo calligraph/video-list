@@ -1,63 +1,112 @@
-const canvas = document.getElementById('sequenceCanvas');
-const { loadFile, saveToLocalStorage, loadFromLocalStorage } = require('./storage');
-const context = canvas.getContext('2d');
+const { loadFile, saveToLocalStorage, loadFromLocalStorage, addVideos, savePlaylist, dropFiles, addEventsForDropZone } = require('./utils');
 const videoManager = require('./videoManager');
-const videoPlayer = document.getElementById('videoPlayer');
-const castButton = document.getElementById('castButton');
+const { fullscreen } = require('./templates');
+const { SequencesBar } = require('./sequencesBar');
 
-// Dessiner des séquences de découpe sur le canvas
-context.fillStyle = 'green';
-context.fillRect(50, 25, 150, 50); // Exemple de séquence
-
-// Chargement automatique des vidéos depuis le localStorage
-const savedVideos = loadFromLocalStorage();
-
-if (savedVideos) {
-  videoManager.load(savedVideos); // Charger les vidéos si elles existent
-  console.log('Vidéos chargées automatiquement depuis localStorage.');
-} else {
-  console.log('Aucune vidéo dans localStorage, démarrage avec un modèle vide.');
-}
-
-// Google Cast SDK pour démarrer le casting
-window['__onGCastApiAvailable'] = function(isAvailable) {
-    if (isAvailable) {
-        initializeCastApi();
-    }
+// Elements
+const elements = {
+  videoPlayer: document.getElementById('videoPlayer'),
+  castButton: document.getElementById('castButton'),
+  loadButton: document.getElementById('loadButton'),
+  saveButton: document.getElementById('saveButton'),
+  playAllCheckbox: document.getElementById('playAll'),
+  onlySequencesCheckbox: document.getElementById('onlySequences'),
+  playPauseButton: document.getElementById('playPauseButton'),
+  rewind10sButton: document.getElementById('rewind10sButton'),
+  forward10sButton: document.getElementById('forward10sButton'),
+  fullscreenButton: document.getElementById('fullscreenButton'),
+  addVideosButton: document.getElementById('addVideosButton'),
+  sequenceBar: document.getElementById('sequenceBar'),
+  addCutButton: document.querySelector('fluent-button'),
+  dropZone: document.getElementById('dropZone')
 };
 
-function initializeCastApi() {
-    const castContext = cast.framework.CastContext.getInstance();
-    castContext.setOptions({
+// Initialize application
+function init() {
+  const sequencesBar = new SequencesBar(elements.sequenceBar, videoManager.getCurrentVideo())
+  videoManager.setSequencesBar(sequencesBar)
+  loadSavedVideos();
+  //setupCastApi();
+  setupEventListeners();
+  addEventsForDropZone(elements.dropZone);
+}
+
+// Load saved videos from localStorage
+function loadSavedVideos() {
+  const savedData = loadFromLocalStorage();
+  if (savedData) {
+    videoManager.load(savedData);
+    elements.playAllCheckbox.checked = videoManager.playAll;
+    elements.onlySequencesCheckbox.checked = videoManager.onlySequences;
+    console.log('Vidéos chargées automatiquement depuis localStorage.');
+  } else {
+    console.log('Aucune vidéo dans localStorage, démarrage avec un modèle vide.');
+  }
+}
+
+// Setup Google Cast API
+function setupCastApi() {
+  window['__onGCastApiAvailable'] = (isAvailable) => {
+    if (isAvailable) {
+      const castContext = cast.framework.CastContext.getInstance();
+      castContext.setOptions({
         receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
         autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-    });
+      });
+    }
+  };
 }
 
+// Load media for casting
 function loadMedia() {
-    const castSession = cast.framework.CastContext.getInstance().getCurrentSession();
-    const mediaInfo = new chrome.cast.media.MediaInfo('https://www.example.com/video.mp4', 'video/mp4');
-    const request = new chrome.cast.media.LoadRequest(mediaInfo);
+  const castSession = cast.framework.CastContext.getInstance().getCurrentSession();
+  const mediaInfo = new chrome.cast.media.MediaInfo('https://www.example.com/video.mp4', 'video/mp4');
+  const request = new chrome.cast.media.LoadRequest(mediaInfo);
+  request.currentTime = 50; // Start at 50 seconds
 
-    // Définir les points de début et de fin pour la séquence
-    request.currentTime = 50; // Exemple: Commencer à 50 secondes
-
-    castSession.loadMedia(request).then(() => {
-        console.log('Media loaded successfully');
-    }).catch((error) => {
-        console.error('Error loading media: ' + error);
-    });
+  castSession.loadMedia(request)
+    .then(() => console.log('Media loaded successfully'))
+    .catch((error) => console.error('Error loading media: ' + error));
 }
 
-// Activer le casting au clic sur le bouton
-castButton.addEventListener('click', loadMedia);
+// Setup event listeners
+function setupEventListeners() {
+  //elements.castButton.addEventListener('click', loadMedia);
+  elements.addVideosButton.addEventListener('click', () => addVideos(videoManager));
+  elements.loadButton.addEventListener('click', () => loadFile(videoManager));
+  elements.saveButton.addEventListener('click', savePlaylist);
+  elements.playPauseButton.addEventListener('click', () => videoManager.togglePlayPause(videoManager.currentVideoIndex));
+  elements.rewind10sButton.addEventListener('click', () => videoManager.rewind10s(getTime()));
+  elements.forward10sButton.addEventListener('click', () => videoManager.forward10s(getTime(), getDuration()));
+  elements.videoPlayer.addEventListener('timeupdate', () => videoManager.timeUpdate(getTime(), getDuration()));
+  elements.videoPlayer.addEventListener('ended', () => videoManager.playNext());
+  elements.fullscreenButton.addEventListener('click', fullscreen);
+  elements.dropZone.addEventListener('drop', (e) => dropFiles(e, videoManager));
+  elements.addCutButton.addEventListener('click', handleAddCut);
+  elements.playAllCheckbox.addEventListener('change', (e) =>  {videoManager.playAll = e.currentTarget.checked})
+  elements.onlySequencesCheckbox.addEventListener('change', (e) => {videoManager.onlySequences = e.currentTarget.checked})
+}
 
-const loadButton = document.getElementById('loadButton');
-const saveButton = document.getElementById('saveButton');
+// Get current time of the video
+function getTime() {
+  return elements.videoPlayer.currentTime;
+}
 
-loadButton.addEventListener('click', loadFile);
+// Get duration of the video
+function getDuration() {
+  return elements.videoPlayer.duration;
+}
 
-saveButton.addEventListener('click', () => {
-    // Simule l'action de sauvegarde
-    alert('Sauvegarde des séquences vidéo');
-});
+// Handle adding a cut
+function handleAddCut() {
+  const video = videoManager.getCurrentVideo();
+  if (video.hasCutscenes()) {
+    const currentCutscene = video.cutscenes.find(cutscene => video.timeCode >= cutscene.begin && video.timeCode <= cutscene.end);
+    if (currentCutscene) {
+      splitSequence(video, video.cutscenes.indexOf(currentCutscene), video.timeCode);
+    }
+  }
+}
+
+// Initialize the application
+init();

@@ -15,6 +15,7 @@
   "dependencies": {
     "@electron/remote": "^2.1.2",
     "@fluentui/react": "^8.120.9",
-    "@fluentui/style-utilities": "^8.10.21"
+    "@fluentui/style-utilities": "^8.10.21",
+    "path": "^0.12.7"
   }
 }

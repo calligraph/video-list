@@ -1,60 +1,94 @@
-function renderCurrentVideo(video, timeCode) {
-  const videoPlayer = document.getElementById('videoPlayer');
-  videoPlayer.src = video.path; // Mettre à jour le chemin de la vidéo
-  //videoPlayer.src = 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4';
+const { fileUrl, handleDragStart, handleDragOver, handleDrop } = require("./utils");
 
-  const scenesContainer = document.getElementById('scenesContainer');
+const videoPlayer = document.getElementById('videoPlayer');
 
-  // Parcourir les cutscenes et les afficher
-  video.cutscenes.forEach((cutscene, index) => {
-    const cutsceneItem = document.createElement('div');
-    cutsceneItem.classList.add('cutscene-item');
+// Formater le temps en hh:mm:ss
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  if (isNaN(hours) || isNaN(mins) || isNaN(secs)) {
+    return "";
+  }
 
-    // Afficher les timestamps des cutscenes
-    const cutsceneText = document.createElement('span');
-    cutsceneText.innerText = `Début: ${cutscene.begin} - Fin: ${cutscene.end}`;
-    cutsceneItem.appendChild(cutsceneText);
+  return `${hours > 0 ? `${String(hours).padStart(2, '0')}:` : ''}${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}  
 
-    // Ajouter un bouton pour supprimer la cutscene
-    const deleteButton = document.createElement('button');
-    deleteButton.innerText = 'Supprimer';
-    deleteButton.addEventListener('click', () => {
-      video.removeCutscene(index); // Supprime la cutscene du modèle
-    });
-    cutsceneItem.appendChild(deleteButton);
-
-    // Ajouter un bouton pour fusionner les cutscenes
-    if (index > 0 && video.cutscenes[index - 1].end >= cutscene.begin - 1) {
-      const mergeButton = document.createElement('button');
-      mergeButton.innerText = 'Fusionner';
-      mergeButton.addEventListener('click', () => {
-        video.cutscenes[index - 1].mergeWith(cutscene);
-        video.removeCutscene(index); // Supprime la deuxième cutscene fusionnée
-        renderCurrentVideo(video); // Re-rendre la vidéo courante
-      });
-      cutsceneItem.appendChild(mergeButton);
-    }
-
-    // Ajouter l'élément cutscene à la scène
-    scenesContainer.appendChild(cutsceneItem);
-  });
+function fullscreen() {
+  if (!document.fullscreenElement) {
+    videoPlayer.requestFullscreen(); // Passer en plein écran
+  } else {
+    document.exitFullscreen(); // Quitter le plein écran
+  }
 }
 
-function renderVideoItem(video, index, isCurrent) {
+function updateCurrentTime(timeCode) {
+    videoPlayer.currentTime = timeCode;
+}
+
+function renderTime(timeCode, duration) {
+    const timerElement = document.getElementById('videoTimer');
+    if (timerElement) {
+      timerElement.textContent = `${formatTime(timeCode)} / ${formatTime(duration)}`;
+    }
+}
+
+function playPauseVideo(isPlaying) {
+  const playPauseButtonText = document.getElementById('playPauseButton');
+  if(isPlaying) {
+    videoPlayer.play()
+    playPauseButtonText.innerHTML = "◼"
+  } else {
+    videoPlayer.pause()
+    playPauseButtonText.innerHTML = "►"
+  }
+}
+
+function renderCurrentVideo(video, isPlaying) {
+  const path = fileUrl(video.path)
+  const currentSrc = videoPlayer.src
+  if (currentSrc !== path) {
+    videoPlayer.src = path; // Mettre à jour le chemin de la vidéo
+    if(isPlaying) {
+      videoPlayer.currentTime = video.timeCode;
+      videoPlayer.play()
+      video.timeCode
+    }
+  }
+}
+
+function renderVideoItem(videoManager, video, index, isCurrent) {
   const videoItem = document.createElement('li');
+  const isPlayed = videoManager.isPlaying
   videoItem.classList.add('video-item');
+  videoItem.setAttribute('draggable', true);
+  videoItem.dataset.index = index;  // Assigner correctement l'index ici
   if (isCurrent) {
     videoItem.classList.add('current');
   }
+  if (isPlayed) {
+    videoItem.classList.add('playing');
+  }
+
+  // Bouton play/stop
+  const playButton = document.createElement('span');
+  playButton.classList.add('play-button');
+  playButton.addEventListener('click', () => {
+    videoManager.togglePlayPause(index);
+  });
+  videoItem.appendChild(playButton);
+
 
   // Ajouter le titre de la vidéo et la rendre cliquable
   const title = document.createElement('span');
+  title.classList.add('title');
   title.innerText = video.title;
   videoItem.appendChild(title);
 
   // Rendre la vidéo cliquable pour la rendre courante
   title.addEventListener('click', () => {
-    videoManager.changeCurrentVideo(index); // Met à jour l'affichage de la vidéo courante
+    videoManager.togglePlayPause(index); // Met à jour l'affichage de la vidéo courante
   });
 
   // Ajouter la case à cocher et le bouton de suppression (comme avant)
@@ -68,29 +102,38 @@ function renderVideoItem(video, index, isCurrent) {
   });
   videoItem.appendChild(checkbox);
 
-  const deleteButton = document.createElement('button');
-  deleteButton.innerText = 'Supprimer';
+  const deleteButton = document.createElement('fluent-button');
+  deleteButton.innerText = '🗑';
   deleteButton.addEventListener('click', () => {
     videoManager.removeVideo(index);
   });
   videoItem.appendChild(deleteButton);
+
+  // Ajouter des événements de drag-and-drop
+  videoItem.addEventListener('dragstart', handleDragStart);
+  videoItem.addEventListener('dragover', handleDragOver);
+  videoItem.addEventListener('drop', handleDrop);
 
   // Ajouter l'élément de la vidéo dans la liste
   return videoItem;
 
 }
 
-function renderVideoList(videos, currentIndex) {
+function renderVideoList(videoManager, videos, currentIndex) {
   const videoListContainer = document.getElementById('videoList');
   videoListContainer.innerHTML = ''; // Vider l'ancienne liste
 
   videos.forEach((video, index)=>{
-    videoListContainer.appendChild(renderVideoItem(video, index, index===currentIndex))
+    videoListContainer.appendChild(renderVideoItem(videoManager, video, index, index===currentIndex))
   })
 }
 
 module.exports = {
   renderCurrentVideo,
   renderVideoItem,
-  renderVideoList
+  renderVideoList,
+  renderTime,
+  updateCurrentTime,
+  fullscreen,
+  playPauseVideo,
 };
