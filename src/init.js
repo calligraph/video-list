@@ -20,6 +20,7 @@ const elements = {
   dropZone: document.getElementById('dropZone'),
   playlistTitle: document.getElementById('playlistTitle'),
   deleteAfterCurrentButton: document.getElementById('deleteAfterCurrent'),
+  deleteBeforeCurrentButton: document.getElementById('deleteBeforeCurrent'),
 };
 
 // Initialize application
@@ -92,6 +93,7 @@ function setupEventListeners() {
   elements.playlistTitle.addEventListener('blur', (e) => e.target.scrollLeft = 0)
   // Boutons sur les sequences
   elements.deleteAfterCurrentButton.addEventListener('click', () => videoManager.removeSequencesAfter());
+  elements.deleteBeforeCurrentButton.addEventListener('click', () => videoManager.removeSequencesBefore());
 }
 
 // Get current time of the video

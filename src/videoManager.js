@@ -96,6 +96,10 @@ class Video {
     this.cutscenes = this.cutscenes.filter(scene => scene.begin < timeCode);
   }
 
+  removeSequencesBefore(timeCode) {
+    this.splitSequence(timeCode);
+    this.cutscenes = this.cutscenes.filter(scene => scene.end > timeCode);
+  }
 
   mergeScenes() {
     for (let i = 0; i < this.cutscenes.length - 1; i++) {
@@ -183,6 +187,12 @@ class VideoManager {
     const video = this.getCurrentVideo();
     video.removeSequencesAfter(video.timeCode);
     this.sequencesBar.render()
+  }
+
+  removeSequencesBefore() {
+    const video = this.getCurrentVideo();
+    video.removeSequencesBefore(video.timeCode);
+    this.sequencesBar.render();
   }
 
   startSequences() {    
