@@ -197,12 +197,20 @@ fluent-button {
   z-index: 2;
 }
 
+.delete-mode .sequence {
+  cursor: url('./assets/trash-can.png') 10 10, not-allowed;
+}
+
 .sequence .resize-handle {
   position: absolute;
   z-index: 3;
-  width: 10px;
+  width: 3px;
   height: 100%;
   top: 0;
+}
+
+.sequence .resize-handle:hover {
+  width: 10px;
 }
 
 .sequence .resize-handle.left {

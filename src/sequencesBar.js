@@ -12,6 +12,7 @@ class SequencesBar {
     this.video = video
     this.resizeSequenceBinded = this.resizeSequence.bind(this);
     this.endResizeBinded = this.endResize.bind(this);
+    this.isDeleteModeActive = false;
   }
 
   setVideo(video) {
@@ -59,13 +60,18 @@ class SequencesBar {
     element.style.display = 'inline-block';
 
     this.addResizeHandles(element, scene, index);
+
+    element.addEventListener('click', (e) => {
+      if (this.isDeleteModeActive && e.target === element) {
+        this.video.removeCutscene(index);
+        this.render();
+      }
+    });
     
     element.addEventListener('dblclick', (e) => {
       if (e.target === element) {
         const bounding = this.container.getBoundingClientRect();
         const cutPoint = (e.clientX - bounding.x) / bounding.width * this.video.duration + 1;
-        console.log(`${cutPoint} = (${e.clientX} - ${bounding.x}) / ${bounding.width} * ${this.video.duration}`)
-        console.log(cutPoint)
         this.video.splitSequence(cutPoint);
         this.render();
       }
@@ -125,6 +131,21 @@ class SequencesBar {
     this.timeIndicatorContainer.classList.add('current-time-indicator');
     this.container.appendChild(this.timeIndicatorContainer);
     this.updateTimeIndicator()
+  }
+
+  toggleDeleteMode() {
+    this.isDeleteModeActive = !this.isDeleteModeActive;
+    const container = document.getElementById('scenesContainer');
+    const deleteSequenceButton = document.getElementById('deleteSequenceButton');
+    if (this.isDeleteModeActive) {
+      deleteSequenceButton.setAttribute('appearance', 'accent');
+      deleteSequenceButton.classList.add('class', 'accent');
+      container.classList.add('delete-mode');
+    } else {
+      deleteSequenceButton.setAttribute('appearance', 'neutral');
+      deleteSequenceButton.classList.remove('accent');
+      container.classList.remove('delete-mode');
+    }
   }
 
   updateTimeIndicator() {

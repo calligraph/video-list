@@ -22,6 +22,7 @@ const elements = {
   deleteAfterCurrentButton: document.getElementById('deleteAfterCurrent'),
   deleteBeforeCurrentButton: document.getElementById('deleteBeforeCurrent'),
   cutCurrentButton: document.getElementById('cutCurrent'),
+  deleteSequenceButton: document.getElementById('deleteSequenceButton'),
 };
 
 // Initialize application
@@ -96,6 +97,7 @@ function setupEventListeners() {
   elements.deleteAfterCurrentButton.addEventListener('click', () => videoManager.removeSequencesAfter());
   elements.cutCurrentButton.addEventListener('click', () => videoManager.cutCurrentSequence());
   elements.deleteBeforeCurrentButton.addEventListener('click', () => videoManager.removeSequencesBefore());
+  elements.deleteSequenceButton.addEventListener('click', () => videoManager.sequencesBar.toggleDeleteMode());
 }
 
 // Get current time of the video

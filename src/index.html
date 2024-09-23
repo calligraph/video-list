@@ -4,10 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
-      script-src 'self' https://unpkg.com https://www.gstatic.com;
-      style-src 'self' 'unsafe-inline';
-      media-src 'self' https://www.learningcontainer.com;">
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self'; 
+    script-src 'self' https://unpkg.com https://www.gstatic.com;
+    style-src 'self' 'unsafe-inline';
+    media-src 'self' https://www.learningcontainer.com;
+    img-src 'self';
+  ">
   <title>Éditeur Vidéo</title>
   <!-- Fluent UI Web Components -->
   <script type="module" src="https://unpkg.com/@fluentui/web-components@2.0.0/dist/web-components.min.js"></script>
@@ -46,6 +49,7 @@
           <fluent-button id="deleteBeforeCurrent">Supprimer avant</fluent-button>
           <fluent-button id="cutCurrent">Couper la séquence</fluent-button>
           <fluent-button id="deleteAfterCurrent">Supprimer après</fluent-button>
+          <fluent-button id="deleteSequenceButton">Supprimer séquence</fluent-button>
         </div>
         <div class="informations">
           ✀ Couper une séquence en double cliquant sur elle ✀<br />
