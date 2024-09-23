@@ -223,6 +223,10 @@ fluent-button {
   cursor: ne-resize;
 }
 
+.sequence-bar .gap {
+  cursor: copy;
+}
+
 .sequence:hover {
   cursor: "🗑", auto;
 }

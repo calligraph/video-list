@@ -71,6 +71,10 @@ class Video {
     return this.cutscenes.length > 0;
   }
 
+  addCutsceneAt(index, begin, end) {
+    this.cutscenes.splice(index, 0, new Cutscene(begin, end));
+  }
+
   addCutscene(begin, end) {
     this.cutscenes.push(new Cutscene(begin, end));
   }

@@ -26,7 +26,7 @@ class SequencesBar {
 
     this.video.cutscenes.forEach((scene, index) => {
       if (scene.begin > lastEnd) {
-        this.addGap(lastEnd, scene.begin);
+        this.addGap(lastEnd, scene.begin, index);
       }
       this.addSequence(scene, index);
       lastEnd = scene.end;
@@ -35,13 +35,20 @@ class SequencesBar {
     this.renderCurrentTimeIndicator();
   }
 
-  addGap(lastEnd, begin) {
+  addGap(lastEnd, begin, index) {
     const duration = this.video.duration
     const element = document.createElement('div');
     const gapDuration = begin - lastEnd;
     const widthPercentage = (gapDuration / duration) * 100;
+    element.classList.add('gap');
     element.style.width = `${widthPercentage}%`;
     element.style.display = 'inline-block';
+    element.addEventListener('click', () => {
+      const newSequence = { begin: Math.ceil(lastEnd+1), end: Math.floor(begin-1) };
+      console.log(newSequence, this.video)
+      this.video.addCutsceneAt(index, newSequence.begin, newSequence.end);
+      this.render();
+    });
     this.container.appendChild(element);
   }
 
