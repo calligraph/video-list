@@ -19,6 +19,7 @@ const elements = {
   sequenceBar: document.getElementById('sequenceBar'),
   dropZone: document.getElementById('dropZone'),
   playlistTitle: document.getElementById('playlistTitle'),
+  deleteAfterCurrentButton: document.getElementById('deleteAfterCurrent'),
 };
 
 // Initialize application
@@ -89,6 +90,8 @@ function setupEventListeners() {
   // Titre de la playlist
   elements.playlistTitle.addEventListener('input', (e) => videoManager.setTitle(e.target.innerText).save())
   elements.playlistTitle.addEventListener('blur', (e) => e.target.scrollLeft = 0)
+  // Boutons sur les sequences
+  elements.deleteAfterCurrentButton.addEventListener('click', () => videoManager.removeSequencesAfter());
 }
 
 // Get current time of the video

@@ -29,6 +29,12 @@ class Video {
     return this.cutscenes[0].begin ? Math.ceil(this.cutscenes[0].begin) : 0
   }
 
+  getSceneAt(timeCode) {
+    return this.cutscenes.find( scene => {
+      return scene.begin<=timeCode && scene.end>=timeCode
+    });
+  }
+
   ensureMinimalCutsceneIfAvailable() {
     if (this.duration > 0 && this.cutscenes.length === 0) {
       this.cutscenes.push(new Cutscene(0, this.duration));
@@ -54,7 +60,7 @@ class Video {
   }
 
   isInScenes(timeCode) {
-    return this.cutscenes.find( scene => scene.begin<=timeCode && scene.end>=timeCode)
+    return this.getSceneAt(timeCode) !== undefined;
   }
 
   nextStart(timeCode) {
@@ -73,11 +79,21 @@ class Video {
     this.cutscenes.splice(index, 1);
   }
   
-  splitSequence(index, cutPoint) {
-    const sequence = this.cutscenes[index]
-    const newSequence =  new Cutscene(cutPoint, sequence.end)
-    sequence.end = cutPoint
+  splitSequence(cutPoint) {
+    console.log("remove after", this.getSceneAt(cutPoint));
+    if( ! this.isInScenes(cutPoint)) {
+      return;
+    }
+    const sequence = this.getSceneAt(cutPoint)
+    const index = this.cutscenes.findIndex(s=>s===sequence)
+    const newSequence =  new Cutscene(cutPoint, sequence.end);
+    sequence.end = cutPoint;
     this.cutscenes.splice(index+1, 0, newSequence);
+  }
+
+  removeSequencesAfter(timeCode) {
+    this.splitSequence(timeCode)
+    this.cutscenes = this.cutscenes.filter(scene => scene.begin < timeCode);
   }
 
 
@@ -161,6 +177,12 @@ class VideoManager {
     updateCurrentTime(timeCode);
     this.renderVideoList();
     this.save();
+  }
+
+  removeSequencesAfter() {
+    const video = this.getCurrentVideo();
+    video.removeSequencesAfter(video.timeCode);
+    this.sequencesBar.render()
   }
 
   startSequences() {    

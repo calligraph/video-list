@@ -66,7 +66,7 @@ class SequencesBar {
         const cutPoint = (e.clientX - bounding.x) / bounding.width * this.video.duration + 1;
         console.log(`${cutPoint} = (${e.clientX} - ${bounding.x}) / ${bounding.width} * ${this.video.duration}`)
         console.log(cutPoint)
-        this.video.splitSequence(index, cutPoint);
+        this.video.splitSequence(cutPoint);
         this.render();
       }
     });
