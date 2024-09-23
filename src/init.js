@@ -17,7 +17,6 @@ const elements = {
   fullscreenButton: document.getElementById('fullscreenButton'),
   addVideosButton: document.getElementById('addVideosButton'),
   sequenceBar: document.getElementById('sequenceBar'),
-  addCutButton: document.querySelector('fluent-button'),
   dropZone: document.getElementById('dropZone'),
   playlistTitle: document.getElementById('playlistTitle'),
 };
@@ -84,7 +83,7 @@ function setupEventListeners() {
   elements.videoPlayer.addEventListener('ended', () => videoManager.playNext());
   elements.fullscreenButton.addEventListener('click', fullscreen);
   elements.dropZone.addEventListener('drop', (e) => dropFiles(e, videoManager));
-  elements.addCutButton.addEventListener('click', handleAddCut);
+  //elements.addCutButton.addEventListener('click', handleAddCut);
   elements.playAllCheckbox.addEventListener('change', (e) =>  {videoManager.playAll = e.currentTarget.checked})
   elements.onlySequencesCheckbox.addEventListener('change', (e) => {videoManager.onlySequences = e.currentTarget.checked})
   // Titre de la playlist
