@@ -21,6 +21,7 @@ const elements = {
   playlistTitle: document.getElementById('playlistTitle'),
   deleteAfterCurrentButton: document.getElementById('deleteAfterCurrent'),
   deleteBeforeCurrentButton: document.getElementById('deleteBeforeCurrent'),
+  cutCurrentButton: document.getElementById('cutCurrent'),
 };
 
 // Initialize application
@@ -93,6 +94,7 @@ function setupEventListeners() {
   elements.playlistTitle.addEventListener('blur', (e) => e.target.scrollLeft = 0)
   // Boutons sur les sequences
   elements.deleteAfterCurrentButton.addEventListener('click', () => videoManager.removeSequencesAfter());
+  elements.cutCurrentButton.addEventListener('click', () => videoManager.cutCurrentSequence());
   elements.deleteBeforeCurrentButton.addEventListener('click', () => videoManager.removeSequencesBefore());
 }
 

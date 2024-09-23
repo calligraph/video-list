@@ -186,13 +186,22 @@ class VideoManager {
   removeSequencesAfter() {
     const video = this.getCurrentVideo();
     video.removeSequencesAfter(video.timeCode);
-    this.sequencesBar.render()
+    this.sequencesBar.render();
+    this.save();
+  }
+
+  cutCurrentSequence() {
+    const video = this.getCurrentVideo();
+    video.splitSequence(video.timeCode);
+    this.sequencesBar.render();
+    this.save();
   }
 
   removeSequencesBefore() {
     const video = this.getCurrentVideo();
     video.removeSequencesBefore(video.timeCode);
     this.sequencesBar.render();
+    this.save();
   }
 
   startSequences() {    
