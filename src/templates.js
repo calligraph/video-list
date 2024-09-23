@@ -46,7 +46,7 @@ function playPauseVideo(isPlaying) {
 }
 
 function renderCurrentVideo(video, isPlaying) {
-  const path = fileUrl(video.path)
+  const path = video?.path ? fileUrl(video.path) : ""
   const currentSrc = videoPlayer.src
   if (currentSrc !== path) {
     videoPlayer.src = path; // Mettre à jour le chemin de la vidéo

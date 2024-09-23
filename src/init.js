@@ -1,4 +1,4 @@
-const { loadFile, saveToLocalStorage, loadFromLocalStorage, addVideos, savePlaylist, dropFiles, addEventsForDropZone } = require('./utils');
+const { loadFile, saveToLocalStorage, loadFromLocalStorage, addVideos, savePlaylist, dropFiles, addEventsForDropZone, saveAsPlaylist, reset } = require('./utils');
 const videoManager = require('./videoManager');
 const { fullscreen } = require('./templates');
 const { SequencesBar } = require('./sequencesBar');
@@ -8,7 +8,9 @@ const elements = {
   videoPlayer: document.getElementById('videoPlayer'),
   castButton: document.getElementById('castButton'),
   loadButton: document.getElementById('loadButton'),
+  resetButton: document.getElementById('resetButton'),
   saveButton: document.getElementById('saveButton'),
+  saveAsButton: document.getElementById('saveAsButton'),
   playAllCheckbox: document.getElementById('playAll'),
   onlySequencesCheckbox: document.getElementById('onlySequences'),
   playPauseButton: document.getElementById('playPauseButton'),
@@ -40,6 +42,10 @@ function loadSavedVideos() {
   const savedData = loadFromLocalStorage();
   if (savedData) {
     videoManager.load(savedData);
+    if(savedData.filePath) {
+      videoManager.filePath = savedData.filePath;
+      document.querySelector('.control-buttons').classList.add('loaded');
+    }
     elements.playAllCheckbox.checked = videoManager.playAll;
     elements.onlySequencesCheckbox.checked = videoManager.onlySequences;
     elements.playlistTitle.innerText = videoManager.title;
@@ -78,7 +84,9 @@ function loadMedia() {
 function setupEventListeners() {
   //elements.castButton.addEventListener('click', loadMedia);
   elements.addVideosButton.addEventListener('click', () => addVideos(videoManager));
+  elements.resetButton.addEventListener('click', reset);
   elements.loadButton.addEventListener('click', () => loadFile(videoManager));
+  elements.saveAsButton.addEventListener('click', saveAsPlaylist);
   elements.saveButton.addEventListener('click', savePlaylist);
   elements.playPauseButton.addEventListener('click', () => videoManager.togglePlayPause(videoManager.currentVideoIndex));
   elements.rewind10sButton.addEventListener('click', () => videoManager.rewind10s(getTime()));

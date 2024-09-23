@@ -147,6 +147,16 @@ body {
   margin-top: 20px;
 }
 
+.loaded #resetButton,
+.loaded #saveButton {
+  display: inline-flex;
+}
+
+#resetButton,
+#saveButton {
+  display: none;
+}
+
 fluent-button {
   --background-color: #0078d4;
   --background-color-hover: #005a9e;
@@ -225,10 +235,8 @@ fluent-button {
 
 .sequence-bar .gap {
   cursor: copy;
-}
+  background-color: rgba(0, 0, 0, 0.05);
 
-.sequence:hover {
-  cursor: "🗑", auto;
 }
 
 .sequence:hover .resize-handle {

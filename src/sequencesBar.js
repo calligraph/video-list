@@ -23,6 +23,9 @@ class SequencesBar {
   render() {
     this.container.innerHTML = '';
     let lastEnd = 0;
+    if(!this.video) {
+      return
+    }
 
     this.video.cutscenes.forEach((scene, index) => {
       if (scene.begin > lastEnd) {

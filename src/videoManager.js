@@ -231,6 +231,10 @@ class VideoManager {
     }
     const video = this.getCurrentVideo();
 
+    if(this.videos.length===0) {
+      return
+    }
+
     if(this.getCurrentVideo().isInScenes(time)) {
       return
     }
@@ -296,14 +300,30 @@ class VideoManager {
     saveToLocalStorage(this.toExternal());
   }
 
+  formatTitleForFilename() {
+    return "playlist." + this.title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')  // Supprimer les caractères spéciaux
+      .replace(/\s+/g, '.')      // Remplacer les espaces par des points
+      .concat('.json');          // Ajouter l'extension JSON
+  }
+
+  saveToFile(filePath) {
+    this.currentFilePath = filePath;
+    const jsonContent = JSON.stringify(this.toExternal(), null, 2);
+    const fs = require('fs');
+    fs.writeFileSync(filePath, jsonContent, 'utf8');
+    console.log('La playlist a été sauvegardée dans le fichier : ' + filePath);
+  }
+
   toExternal() {
     return {
+      title: this.title,
       currentVideoIndex: this.currentVideoIndex,
       onlySequences: this.onlySequences,
       isPlaying: this.isPlaying,
       playAll: this.playAll,
       videos: this.videos,
-      title: this.title, // Ajout du titre de la playlist
     };
   }
 

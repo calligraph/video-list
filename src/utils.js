@@ -104,6 +104,7 @@ function addEventsForDropZone(dropZone) {
 // Storage
 
 const localStorageKey = "video-editor"
+const localStoragePathKey = 'playlistPath'
 
 // Sauvegarder les données dans localStorage
 function saveToLocalStorage(data) {
@@ -113,35 +114,36 @@ function saveToLocalStorage(data) {
 // Charger les données depuis localStorage
 function loadFromLocalStorage() {
   try {
-    return JSON.parse(localStorage.getItem(localStorageKey));
+    const data = JSON.parse(localStorage.getItem(localStorageKey));
+    data.filePath = localStorage.getItem(localStoragePathKey)
+    return data;
   } catch {
     return null
   }
 }
 
 // Fonction pour charger un fichier JSON
-function loadFile(videoManager) {
-  // Ouvrir la fenêtre de dialogue pour sélectionner un fichier
-  console.log(videoManager)
+function loadFile() {
   dialog.showOpenDialog({
     title: 'Choisir un fichier vidéo JSON',
     properties: ['openFile'],
     filters: [{ name: 'JSON Files', extensions: ['json'] }]
   }).then(result => {
     if (!result.canceled) {
-      const filePath = result.filePaths[0]; // Chemin du fichier sélectionné
-
-      // Lire le contenu du fichier
+      const filePath = result.filePaths[0];
       readFile(filePath, 'utf8', (err, data) => {
         if (err) {
           console.error('Erreur lors de la lecture du fichier:', err);
           return;
         }
-
-        // Charger le JSON dans VideoManager
         try {
-          console.log(videoManager)
           videoManager.load(JSON.parse(data));
+          videoManager.filePath = filePath;
+          localStorage.setItem('playlistPath', result.filePath);
+          document.querySelector('.control-buttons').classList.add('loaded');
+          document.querySelector('#playAll').checked = videoManager.playAll;
+          document.querySelector('#onlySequences').checked = videoManager.onlySequences;
+          document.querySelector('#playlistTitle').innerText = videoManager.title;
           console.log('Vidéos chargées depuis le fichier:', filePath); 
         } catch (error) {
           console.error('Erreur lors du chargement du JSON:', error);
@@ -155,26 +157,19 @@ function loadFile(videoManager) {
 
 // Fonction pour ajouter des vidéos à la playlist
 function addVideos(videoManager) {
-  console.log(videoManager)
     // Ouvre la boîte de dialogue de sélection de fichiers
   dialog.showOpenDialog({
       properties: ['openFile', 'multiSelections'],
       filters: [{ name: 'Videos', extensions: ['mp4', 'mkv', 'avi'] }]
   }).then(result => {
       if (!result.canceled) {
-          // Récupère les chemins des fichiers sélectionnés
           const files = result.filePaths;
 
-          // Ajoute chaque fichier sélectionné au VideoManager (ton modèle)
           files.forEach(file => {
               let titleParts = file.split('/').pop().split(".")
               titleParts.pop()
               let title = titleParts.join(".")
-              videoManager.addVideo(
-                  title, // Utilise le nom du fichier comme titre
-                  file,
-                  true  // Marquer comme activé par défaut
-              );
+              videoManager.addVideo(title, file, true);
           });
 
           // Rafraîchir l'affichage après avoir ajouté les vidéos
@@ -186,33 +181,39 @@ function addVideos(videoManager) {
 }
 
 function savePlaylist() {
-    // Ouvrir une boîte de dialogue pour choisir où sauvegarder le fichier
-    dialog.showSaveDialog({
-        title: 'Sauvegarder la playlist',
-        defaultPath: 'playlist.json',
-        filters: [{ name: 'JSON', extensions: ['json'] }]
-    }).then(result => {
-        if (!result.canceled) {
-            const filePath = result.filePath;
+  videoManager.saveToFile(videoManager.currentFilePath)
+}
 
-            // Récupérer les vidéos depuis le VideoManager
-            const videos = videoManager.toExternal();
+function saveAsPlaylist() {
+  dialog.showSaveDialog({
+    title: 'Sauvegarder la playlist',
+    defaultPath: videoManager.formatTitleForFilename(),
+    filters: [{ name: 'JSON', extensions: ['json'] }]
+  }).then(result => {
+    if (!result.canceled) {
+      videoManager.saveToFile(result.filePath);
+      localStorage.setItem('playlistPath', result.filePath);
+      document.querySelector('.control-buttons').classList.add('loaded');
+    }
+  }).catch(err => {
+      console.error('Erreur lors de l\'ouverture de la boîte de dialogue de sauvegarde :', err);
+  });
+}
 
-            // Convertir les données en JSON
-            const jsonContent = JSON.stringify({ movies: videos }, null, 2);
+function reset() {
+  videoManager.videos = [];
+  videoManager.currentVideoIndex = 0;
+  videoManager.isPlaying = false;
+  videoManager.currentFilePath = null;
+  localStorage.removeItem(localStorageKey);
+  localStorage.removeItem(localStoragePathKey);
+  videoManager.renderVideoList();
+  videoManager.renderVideo();
+  console.log('VideoManager réinitialisé.');
+  document.querySelector('.control-buttons').classList.remove('loaded');
+  document.getElementById('videoTimer').textContent = ""
+  document.querySelector('#playlistTitle').innerText = "";
 
-            // Écrire le fichier JSON
-            writeFileSync(filePath, jsonContent, 'utf8', (err) => {
-                if (err) {
-                    console.error('Erreur lors de la sauvegarde du fichier:', err);
-                } else {
-                    console.log('La playlist a été sauvegardée avec succès.');
-                }
-            });
-        }
-    }).catch(err => {
-        console.error('Erreur lors de l\'ouverture de la boîte de dialogue de sauvegarde :', err);
-    });
 }
 
 module.exports = {
@@ -226,5 +227,7 @@ module.exports = {
   loadFromLocalStorage,
   loadFile,
   addVideos,
+  saveAsPlaylist,
   savePlaylist,
+  reset,
 };
